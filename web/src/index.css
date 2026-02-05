@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* Theme tokens */
+@theme {
+  /* Fonts */
+  --font-display: "Space Mono", monospace;
+  --font-body: "IBM Plex Sans", sans-serif;
+
+  /* Colors */
+  --color-neon-green: #00FF41;
+  --color-deep-purple: #0A0E27;
+  --color-electric-blue: #00D4FF;
+  --color-warm-orange: #FF6B35;
+
+  /* Animations */
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-fade-in: fadeIn 0.5s ease-out;
+}
+
+/* Keyframes */
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px #00FF41, 0 0 10px #00FF41;
+  }
+  100% {
+    box-shadow:
+      0 0 20px #00FF41,
+      0 0 30px #00FF41,
+      0 0 40px #00FF41;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
