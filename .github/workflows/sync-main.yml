@@ -1,0 +1,30 @@
+name: Sync from source repo
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [sync-from-main]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout deploy repo (Repo B)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Add source repo (Repo A)
+        run: |
+          git remote add source https://x-access-token:${{ secrets.SOURCE_REPO_TOKEN }}@https://github.com/EfosaE/voice-agent.git
+          git fetch source SOURCE_BRANCH
+
+      - name: Sync source → deploy repo
+        run: |
+          git reset --hard source/SOURCE_BRANCH
+
+      - name: Push to deploy repo
+        run: |
+          git push origin main --force
