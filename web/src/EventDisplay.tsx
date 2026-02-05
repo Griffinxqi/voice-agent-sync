@@ -126,7 +126,7 @@ const EventDisplay: React.FC<EventDisplayProps> = ({ events }) => {
           ...currentAgentChunk,
           text: currentAgentChunk.text + event.text,
           ts: event.ts,
-        };
+        } as AgentChunkEvent;
       } else {
         currentAgentChunk = event;
       }
