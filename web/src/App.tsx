@@ -4,6 +4,7 @@ import { useVoiceSession } from "./useWebSocket";
 import EventDisplay from "./EventDisplay";
 
 function App() {
+  const wsUrl = import.meta.env.VITE_WS_BASE_URL;
   const {
     isConnected,
     isRecording,
@@ -11,7 +12,7 @@ function App() {
     startRecording,
     stopRecording,
     clearEvents,
-  } = useVoiceSession("ws://localhost:8000/ws");
+  } = useVoiceSession(wsUrl);
 
   /**
    * Latest STT transcript (derived from events)

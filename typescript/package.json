@@ -6,7 +6,7 @@
   "scripts": {
     "server": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-     "build": "tsup",
+    "build": "tsup",
     "start": "node dist/index.js",
     "lint": "eslint ."
   },
