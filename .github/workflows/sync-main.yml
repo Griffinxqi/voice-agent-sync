@@ -30,5 +30,11 @@ jobs:
         run: |
           git checkout main
           git checkout source/main -- . ':!\.github/workflows/**'
-          git commit -m "Sync code from main repo" || echo "No changes"
-          git push origin main
+            # Only commit if there are actual changes
+          if ! git diff-index --quiet HEAD; then
+            git add -A
+            git commit -m "Sync code from main repo"
+            git push origin main
+          else
+            echo "No changes to push, skipping commit"
+          fi
