@@ -254,7 +254,7 @@ async function* ttsStream(
 
 // app.get("/*", serveStatic({ root: STATIC_DIR }));
 
-app.get(
+app.use(
   "/ws",
   upgradeWebSocket(async () => {
     let currentSocket: WSContext<WebSocket> | undefined;
