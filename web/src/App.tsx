@@ -12,7 +12,7 @@ function App() {
     startRecording,
     stopRecording,
     clearEvents,
-  } = useVoiceSession(wsUrl);
+  } = useVoiceSession(`${wsUrl}/ws`);
 
   /**
    * Latest STT transcript (derived from events)
