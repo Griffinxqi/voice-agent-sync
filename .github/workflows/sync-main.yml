@@ -26,10 +26,9 @@ jobs:
           git remote add source https://x-access-token:${{ secrets.SOURCE_REPO_TOKEN }}@github.com/EfosaE/voice-agent.git
           git fetch source main
 
-      - name: Sync source → deploy repo
+      - name: Sync source → deploy repo (excluding workflows)
         run: |
-          git reset --hard source/main
-
-      - name: Push to deploy repo
-        run: |
-          git push origin main --force
+          git checkout main
+          git checkout source/main -- . ':!\.github/workflows/**'
+          git commit -m "Sync code from main repo" || echo "No changes"
+          git push origin main
