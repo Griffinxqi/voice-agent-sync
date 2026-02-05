@@ -254,6 +254,16 @@ async function* ttsStream(
 
 // app.get("/*", serveStatic({ root: STATIC_DIR }));
 
+app.get("/", (c) => {
+  return c.json({
+    message: "Welcome to Voice Agent API",
+    status: "running",
+    endpoints: {
+      websocket: "/voice",
+    },
+  });
+});
+
 app.use(
   "/ws",
   upgradeWebSocket(async () => {
