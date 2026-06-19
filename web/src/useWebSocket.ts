@@ -22,10 +22,14 @@ export function useVoiceSession(url: string): UseVoiceSessionReturn {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<number | null>(null);
   const shouldReconnectRef = useRef(true);
+  const assistantSpeakingRef = useRef(false);
 
   /** ---------------- AUDIO ---------------- */
   const audioCapture = useAudioCapture();
-  const audioPlayback = useAudioPlayback();
+  const audioPlayback = useAudioPlayback(() => {
+    console.log("Assistant stopped speaking");
+    assistantSpeakingRef.current = false;
+  });
 
   // Store stable references
   const audioCaptureRef = useRef(audioCapture);
@@ -41,6 +45,7 @@ export function useVoiceSession(url: string): UseVoiceSessionReturn {
     (event: ServerEvent) => {
       setEvents((prev) => [...prev, event]);
       if (event.type === "tts_chunk") {
+        assistantSpeakingRef.current = true;
         audioPlaybackRef.current.push(event.audio);
       }
     },
@@ -114,20 +119,28 @@ export function useVoiceSession(url: string): UseVoiceSessionReturn {
     }
 
     await audioCaptureRef.current.start((chunk) => {
-      console.log("Audio chunk:", chunk.byteLength);
       if (chunk.byteLength === 0) return;
+
+      console.log(
+        "assistantSpeaking? audio rejected:",
+        assistantSpeakingRef.current,
+      );
+      if (assistantSpeakingRef.current) {
+        return;
+      }
+
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(chunk);
       }
     });
 
     setIsRecording(true);
-  }, []); // Remove audioCapture dependency
+  }, []);
 
   const stopRecording = useCallback(() => {
     audioCaptureRef.current.stop();
     setIsRecording(false);
-  }, []); // Remove audioCapture dependency
+  }, []);
 
   /** ---------------- PUBLIC API ---------------- */
   return {

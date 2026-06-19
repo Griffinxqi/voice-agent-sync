@@ -3,6 +3,8 @@ export type ServerEvent =
   | { type: "stt_chunk"; ts: number; transcript: string }
   | { type: "stt_output"; ts: number; transcript: string }
   | { type: "agent_chunk"; ts: number; text: string }
+  | { type: "tts_end"; ts: number }
+  | { type: "tts_start"; ts: number }
   | {
       type: "tool_call";
       ts: number;

@@ -9,7 +9,9 @@ export interface AudioPlayback {
   resetScheduling: () => void;
 }
 
-export function useAudioPlayback(): AudioPlayback {
+export function useAudioPlayback(
+  onPlaybackFinished?: () => void,
+): AudioPlayback {
   const audioContextRef = useRef<AudioContext | null>(null);
   const nextPlayTimeRef = useRef(0);
   const sourceQueueRef = useRef<AudioBufferSourceNode[]>([]);
@@ -54,23 +56,40 @@ export function useAudioPlayback(): AudioPlayback {
 
       return audioBuffer;
     },
-    [ensureContext]
+    [ensureContext],
   );
 
-  const sourceEnded = useCallback((source: AudioBufferSourceNode) => {
-    const queue = sourceQueueRef.current;
-    const index = queue.indexOf(source);
-    if (index !== -1) {
-      queue.splice(index, 1);
-    }
-  }, []);
+  const sourceEnded = useCallback(
+    (source: AudioBufferSourceNode) => {
+      const queue = sourceQueueRef.current;
+
+      const index = queue.indexOf(source);
+
+      if (index !== -1) {
+        queue.splice(index, 1);
+      }
+
+      const playbackFinished =
+        queue.length === 0 && base64QueueRef.current.length === 0;
+
+      if (playbackFinished) {
+        console.log("Playback fully completed");
+
+        // optional echo-protection delay
+        setTimeout(() => {
+          onPlaybackFinished?.();
+        }, 300);
+      }
+    },
+    [onPlaybackFinished],
+  );
 
   const schedulePlaySource = useCallback(
     (source: AudioBufferSourceNode) => {
       source.start(nextPlayTimeRef.current);
       source.addEventListener("ended", () => sourceEnded(source));
     },
-    [sourceEnded]
+    [sourceEnded],
   );
 
   const processQueue = useCallback(() => {
@@ -113,7 +132,7 @@ export function useAudioPlayback(): AudioPlayback {
       base64QueueRef.current.push(pcmBase64);
       processQueue();
     },
-    [processQueue]
+    [processQueue],
   );
 
   const stop = useCallback(() => {

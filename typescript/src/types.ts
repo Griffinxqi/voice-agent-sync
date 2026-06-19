@@ -187,6 +187,14 @@ export namespace VoiceAgentEvent {
      */
     audio: string;
   }
+
+  export interface TTSStart extends BaseEvent {
+    readonly type: "tts_start";
+  }
+
+  export interface TTSEnd extends BaseEvent {
+    readonly type: "tts_end";
+  }
 }
 
 /**
@@ -216,4 +224,6 @@ export type VoiceAgentEvent =
   | VoiceAgentEvent.UserInput
   | VoiceAgentEvent.STTEvent
   | VoiceAgentEvent.AgentEvent
-  | VoiceAgentEvent.TTSChunk;
+  | VoiceAgentEvent.TTSChunk
+  | VoiceAgentEvent.TTSStart
+  | VoiceAgentEvent.TTSEnd;

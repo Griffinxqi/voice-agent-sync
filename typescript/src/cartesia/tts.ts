@@ -27,7 +27,7 @@ export class CartesiaTTS {
   language: string;
   cartesiaVersion: string;
 
-  protected _bufferIterator = writableIterator<VoiceAgentEvent.TTSChunk>();
+  protected _bufferIterator = writableIterator<VoiceAgentEvent>();
   protected _connectionPromise: Promise<WebSocket> | null = null;
   protected _contextCounter = 0;
 
@@ -66,6 +66,11 @@ export class CartesiaTTS {
             this._bufferIterator.push({
               type: "tts_chunk",
               audio: message.data,
+              ts: Date.now(),
+            });
+          } else if (message.done) {
+            this._bufferIterator.push({
+              type: "tts_end",
               ts: Date.now(),
             });
           } else if (message.error) {
@@ -133,7 +138,7 @@ export class CartesiaTTS {
     }
   }
 
-  async *receiveEvents(): AsyncGenerator<VoiceAgentEvent.TTSChunk> {
+  async *receiveEvents(): AsyncGenerator<VoiceAgentEvent> {
     yield* this._bufferIterator;
   }
 

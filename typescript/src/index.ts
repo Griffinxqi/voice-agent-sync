@@ -56,6 +56,8 @@ const agent = createAgent({
   systemPrompt: PUBLIC_SUPPORT_TTS_SYSTEM_PROMPT,
 });
 
+let assistantSpeaking = false;
+
 /**
  * Transform stream: Audio (Uint8Array) → Voice Events (VoiceAgentEvent)
  *
@@ -221,7 +223,18 @@ async function* ttsStream(
         }
         // Send all buffered text to Cartesia for synthesis
         if (event.type === "agent_end") {
+          // console.log("Sending text to Cartesia for TTS:", buffer.join(" "));
+          // await tts.sendText(buffer.join(""));
+          // buffer = [];
+          assistantSpeaking = true;
+
+          passthrough.push({
+            type: "tts_start",
+            ts: Date.now(),
+          });
+
           await tts.sendText(buffer.join(""));
+
           buffer = [];
         }
       }
@@ -271,6 +284,7 @@ app.use(
 
     // Create a writable stream for incoming WebSocket audio data
     const inputStream = writableIterator<Uint8Array>();
+    // console.log("Input:", inputStream);
 
     // Define the voice processing pipeline as a chain of async generators
     // Audio -> STT events
@@ -284,6 +298,9 @@ app.use(
       // Process all events from the pipeline, sending events back to the client
       for await (const event of outputEventStream) {
         currentSocket?.send(JSON.stringify(event));
+        if (event.type === "tts_end") {
+          assistantSpeaking = false; // re-open mic after TTS finishes
+        }
       }
     });
 
@@ -292,6 +309,10 @@ app.use(
         currentSocket = ws;
       },
       onMessage(event) {
+        // console.log("Received audio chunk:", event.data);
+        // console.log("Assistant speaking:", assistantSpeaking);
+        if (assistantSpeaking) return; // Ignore incoming audio while the assistant is speaking
+
         // Push incoming audio data into the pipeline's input stream
         const data = event.data;
         if (Buffer.isBuffer(data)) {
