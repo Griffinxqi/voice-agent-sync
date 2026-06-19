@@ -103,6 +103,13 @@ const EventDisplay: React.FC<EventDisplayProps> = ({ events }) => {
 
       case "tts_chunk":
         return <div className="text-xs opacity-60">Audio chunk received</div>;
+      case "tts_start":
+        return <div className="text-xs opacity-60">Text-to-Speech started</div>;
+      case "tts_end":
+        return <div className="text-xs opacity-60">Text-to-Speech ended</div>;
+
+      default:
+        return <div>Unknown event type</div>;
     }
   };
 
